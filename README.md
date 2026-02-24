@@ -95,6 +95,22 @@ When Cobblemon is present alongside the Cobble Core module, the default currency
 - **Leaderboard service**: Query top players by any stat key with configurable page size
 - **Hologram leaderboards**: Display floating leaderboard text at world positions
 
+### Stats & Leaderboards
+
+| Feature | Description |
+|--------|-------------|
+| **Player stats** | Increment per-player stats by key (e.g. `deaths`, `player_kills`, `mob_kills`, `play_time_minutes`, `login_count`). |
+| **Leaderboard service** | Query top-N players for a stat key. Used by holograms and custom UIs. |
+| **Stat keys (API)** | `CatalystAPI.StatKeys`: `DEATHS`, `PLAYER_KILLS`, `MOB_KILLS`, `PLAY_TIME_MINUTES`, `LOGIN_COUNT`. |
+| **Commands** | `/catalyst balance [currency]`, `/catalyst pay <player> <amount> [currency]` (and others as implemented). |
+
+### Login Rewards
+
+- Configurable daily (or cooldown-based) login rewards.
+- Minimum interval (e.g. 12 hours) to prevent abuse.
+- Reward items and broadcast message in config.
+- Toggle on/off in `catalyst-common.toml`.
+
 ### Hologram Display System
 
 - **Decent Holograms-like functionality**: Create, update, and remove floating text displays anywhere in the world
@@ -109,6 +125,29 @@ When Cobblemon is present alongside the Cobble Core module, the default currency
 - **Balance display**: Shows current currency balance
 - **Opened via command**: `/catalyst gui` opens the hub from anywhere
 
+## Catalyst API Surface
+
+The API is used by Catalyst Core and by every Catalyst module. It provides:
+
+### Stats & Leaderboards
+
+- **CatalystAPI.MOD_ID** — `"catalyst"` for `ModList.get().isLoaded()`.
+- **CatalystAPI.StatKeys** — `DEATHS`, `PLAYER_KILLS`, `MOB_KILLS`, `PLAY_TIME_MINUTES`, `LOGIN_COUNT`.
+- **PlayerStatSnapshot** — Snapshot of a player's stat key → value map.
+- **Integration** — Access `CatalystCoreMod.core()` and then `playerStatsService()`, `leaderboardService()` (see CatalystAPI.java Javadoc for examples).
+
+### Economy
+
+- **CurrencyMode** — Enum for balance storage strategy.
+- **CurrencyBalance** — Currency ID + amount.
+- **CurrencyProfileData**, **CurrencyTier** — Datapack currency definitions.
+- **ShopPageData**, **ShopItemEntry** — Market shop structure.
+
+### Integration
+
+- **IntegrationService** — Interface: `integrationId()`, `isAvailable()`, `onEnable()`, `onDisable()`. Optional modules implement this and register with Core.
+
+
 ### Commands
 
 | Command | Permission | Description |
@@ -120,11 +159,15 @@ When Cobblemon is present alongside the Cobble Core module, the default currency
 | `/catalyst gui` | Player | Open the main Catalyst GUI hub |
 | `/catalyst reload` | Admin (level 2) | Reload all datapacks |
 
-### Special Items
+### Blocks & Items (Core)
 
-- **Catalyst Crystal**: Rare, uncraftable quest reward item with enchantment glint. Function pending future development.
-- **Catalyst Core Block**: Crafted from 9 Catalyst Crystals. Decorative and functional block that emits light and particles.
-
+| ID | Type | Purpose |
+|----|------|--------|
+| `catalyst:market_block` | Block + BlockEntity | Shop GUI; datapack-driven pages. |
+| `catalyst:daily_exchange_block` | Block + BlockEntity | Auto-sell input items for currency output; hopper I/O. |
+| `catalyst:catalyst_core_block` | Block | Decorative/crafting; used in Lunar and Cobble Bag recipes. |
+| `catalyst:catalyst_crystal` | Item | Quest/reward item; used in crescent and PokeBag crafting. |
+| Currency items | Item | Amethyst/netherite coins (and piles/blocks); PokeDollar/Master Token chain when Cobble Core present. |
 ---
 
 ## Configuration
